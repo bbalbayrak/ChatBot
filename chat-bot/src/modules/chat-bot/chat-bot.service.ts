@@ -38,7 +38,6 @@ export class ChatBotService {
     return session.save();
   }
 
-  // Session ID ile tüm cevapları getiren fonksiyon
   async getAnswersBySession(sessionId: string): Promise<Answer[]> {
     return this.answerModel.find({ sessionId }).exec();
   }

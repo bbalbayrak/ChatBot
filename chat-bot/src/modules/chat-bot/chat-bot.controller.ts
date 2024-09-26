@@ -25,11 +25,10 @@ export class ChatBotController {
   ) {
     if (!session.currentQuestionIndex) {
       session.currentQuestionIndex = 0;
-      session.sessionId = new Date().toISOString(); // Her session için benzersiz ID
+      session.sessionId = new Date().toISOString();
     }
 
     if (answer) {
-      // Cevabı kaydedin
       await this.chatBotService.saveAnswer(session.sessionId, answer);
       session.currentQuestionIndex++;
     }
