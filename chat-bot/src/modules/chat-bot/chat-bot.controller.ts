@@ -1,6 +1,5 @@
-import { Body, Controller, Get, Post, Query, Session } from '@nestjs/common';
+import { Body, Controller, Get, Query, Session } from '@nestjs/common';
 import { ChatBotService } from './chat-bot.service';
-import { chatCompletionRequest } from './dto/openai.dto';
 
 @Controller('chat-bot')
 export class ChatBotController {
@@ -17,12 +16,7 @@ export class ChatBotController {
     'How would you describe the relationship between humans and cats in three words?',
   ];
 
-  // constructor(private readonly chatBotService: ChatBotService) {}
-
-  // @Post('chatCompletionMessage')
-  // async chatCompletionMessage(@Body() body: chatCompletionRequest) {
-  //   return this.chatBotService.createChatCompletionMessage(body.messages);
-  // }
+  constructor(private readonly chatBotService: ChatBotService) {}
 
   @Get('ask')
   async askQuestion(
@@ -31,22 +25,17 @@ export class ChatBotController {
   ) {
     if (!session.currentQuestionIndex) {
       session.currentQuestionIndex = 0;
-      session.answers = [];
+      session.sessionId = new Date().toISOString(); // Her session için benzersiz ID
     }
 
     if (answer) {
-      session.answers.push(answer);
+      // Cevabı kaydedin
+      await this.chatBotService.saveAnswer(session.sessionId, answer);
       session.currentQuestionIndex++;
     }
 
     if (session.currentQuestionIndex >= this.questions.length) {
-      const result = {
-        questions: this.questions,
-        answers: session.answers,
-      };
-      session.currentQuestionIndex = 0;
-      session.answers = [];
-      return { message: 'All questions done.', result };
+      return { message: 'All questions done.' };
     }
 
     const nextQuestion = this.questions[session.currentQuestionIndex];
